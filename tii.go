@@ -79,14 +79,14 @@ func findPkg(search string) {
 	if len(possibleMatches) > 0 {
 		fmt.Println("Presenting possible matches [" + strconv.Itoa(len(possibleMatches)) + "]")
 		for i, name := range possibleMatches {
-			fmt.Println(strconv.Itoa(i+1) + ": " + name)
+			fmt.Println(strconv.Itoa(i+1) + ": " + color.GreenString(name))
 		}
 		if ok, i := promptInt("Enter number to install or press enter to quit: ", 1, len(possibleMatches)); ok {
 			runWithPrompt("Run `brew install "+possibleMatches[i+1]+"`?", "brew install "+possibleMatches[i+1])
 		}
 	}
 	if !gotExactMatch {
-		fmt.Println("No exact matches found for " + search + ".")
+		fmt.Println("No exact matches found for " + color.YellowString(search) + ".")
 		runWithPrompt("Update Homebrew formulae database with `brew update`?", "brew update")
 	}
 }
