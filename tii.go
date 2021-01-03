@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 var (
@@ -38,7 +40,7 @@ func main() {
 		return
 	}
 	if len(os.Args) > 2 {
-		fmt.Println("Error: too many arguments")
+		color.Red("Error: too many arguments")
 		fmt.Println(helpMsg)
 		return
 	}
