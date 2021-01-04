@@ -3,13 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 var (
@@ -31,6 +30,7 @@ Examples:
 If tii was installed correctly, using commands which are not found will 
 automatically trigger it. The name tii is an acronym for "Then Install It".`
 	formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+	underline        = color.New(color.Underline).SprintFunc()
 )
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 	if len(os.Args) > 2 {
-		handleErrStr("error: too many arguments")
+		handleErrStr("too many arguments")
 		fmt.Println(helpMsg)
 		return
 	}
@@ -51,7 +51,6 @@ func main() {
 	findPkg(os.Args[1])
 }
 
-// takes in a string to search for a package
 func findPkg(search string) {
 	file, err := os.Open(formulaeLocation)
 	if err != nil {
@@ -80,12 +79,12 @@ func findPkg(search string) {
 		}
 	}
 	if len(possibleMatches) > 0 {
-		fmt.Println("Presenting possible matches [" + strconv.Itoa(len(possibleMatches)) + "]")
+		fmt.Println("Presenting possible matches [" + color.CyanString(strconv.Itoa(len(possibleMatches))) + "]")
 		for i, name := range possibleMatches {
-			fmt.Println(strconv.Itoa(i+1) + ": " + color.GreenString(name))
+			fmt.Println(color.CyanString(strconv.Itoa(i+1)) + ": " + name)
 		}
 		if ok, i := promptInt("Enter number to install or press enter to quit: ", 1, len(possibleMatches)); ok {
-			runWithPrompt("Run", "brew install "+possibleMatches[i+1])
+			runWithPrompt("Run", "brew install "+possibleMatches[i-1])
 		}
 	}
 	if !gotExactMatch {
@@ -96,10 +95,12 @@ func findPkg(search string) {
 
 func promptBool(promptStr string) (yes bool) {
 	for {
-		fmt.Print(promptStr + " (y/N) > ")
+		fmt.Print(underline(promptStr) + " (y/N) > ")
+		color.Set(color.FgCyan)
 		if !scanner.Scan() {
 			break
 		}
+		color.Unset()
 		switch scanner.Text() {
 		case "y", "Y", "yes", "Yes", "YES", "true", "True", "TRUE":
 			return true
@@ -115,10 +116,12 @@ func promptBool(promptStr string) (yes bool) {
 // quits if user enters enter
 func promptInt(promptStr string, lowerLimit int, upperLimit int) (bool, int) {
 	for {
-		fmt.Print(promptStr)
+		fmt.Print(underline(promptStr))
+		color.Set(color.FgCyan)
 		if !scanner.Scan() {
 			break
 		}
+		color.Unset()
 		if scanner.Text() == "" {
 			break
 		}
@@ -130,7 +133,7 @@ func promptInt(promptStr string, lowerLimit int, upperLimit int) (bool, int) {
 }
 
 func runWithPrompt(promptStr string, command string) (ran bool) {
-	yes := promptBool(promptStr + " with " + "`" + command + "`" + "?")
+	yes := promptBool(promptStr + " with " + "`" + color.YellowString(command) + "`" + "?")
 	if yes {
 		// run it with the users shell
 		cmd := exec.Command(os.Getenv("SHELL"), "-c", command) //nolint //"Subprocess launched with function call as argument or cmd arguments"
@@ -142,6 +145,9 @@ func runWithPrompt(promptStr string, command string) (ran bool) {
 			handleErr(err)
 			return false
 		}
+		cmd.Stderr = nil
+		cmd.Stdout = nil
+		cmd.Stdin = nil
 	}
 	return yes
 }
@@ -156,9 +162,9 @@ func argsHaveOption(long string, short string) (hasOption bool, foundAt int) {
 }
 
 func handleErr(err error) {
-  fmt.Fprintln(os.Stderr, color.Red("error: "+err.Error()))
+	_, _ = fmt.Fprintln(os.Stderr, color.RedString("Error: ")+err.Error())
 }
 
 func handleErrStr(str string) {
-  fmt.Fprintln(os.Stderr, color.Red(str))
+	_, _ = fmt.Fprintln(os.Stderr, color.RedString("Error: ")+str)
 }
