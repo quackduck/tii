@@ -3,31 +3,32 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/fatih/color"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 var (
 	scanner = bufio.NewScanner(os.Stdin)
 	helpMsg = `Tii - Directly install command when not found
 
-On most GNU/Linux systems, when a command is not found, a message showing what 
-can be run to install the command is printed. However, macOS does not 
-have this. This program supports a similar function with support for macOS 
-(only for macOS, as of now). Instead of simply printing the command, Tii also 
-offers to run it for you. 
+On most GNU/Linux systems, when a command is not found, a message showing what
+can be run to install the command is printed. However, macOS does not
+have this. This program supports a similar function with support for macOS
+(only for macOS, as of now). Instead of simply printing the command, Tii also
+offers to run it for you.
 
 Usage: tii [--help/-h | <command>]
-Examples: 
+Examples:
    tii fish
    tii cowsay
    tii --help
 
-If Tii was installed correctly, using commands which are not found will 
+If Tii was installed correctly, using commands which are not found will
 automatically trigger it. The name Tii is an acronym for "Then Install It".`
 	formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
 	underline        = color.New(color.Underline).SprintFunc()
