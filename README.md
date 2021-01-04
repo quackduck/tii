@@ -4,9 +4,7 @@ On most GNU/Linux systems, when a command is not found, a message showing what c
 
 This program supports a similar function with support for macOS (only for macOS, as of now). Instead of simply printing the command, Tii also offers to run it for you.
 
-[comment]: <> ([![asciicast]&#40;https://asciinema.org/a/5eqCdcG6V8PC1nkekxbJ6gTXW.svg&#41;]&#40;https://asciinema.org/a/5eqCdcG6V8PC1nkekxbJ6gTXW?autoplay=1&&#41;)
-
-![demo](https://cloud-5no1v5e34.vercel.app/0ezgif-6-80cd802cef12.gif)
+[![asciicast](https://asciinema.org/a/382511.svg)](https://asciinema.org/a/382511?autoplay=1&speed=2)
 
 The name Tii is an acronym for "Then Install It", what you will probably say when shown "command not found".
 
