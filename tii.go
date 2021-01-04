@@ -90,7 +90,7 @@ func findPkg(search string) {
 	}
 	if !gotExactMatch {
 		fmt.Println("No exact matches found for " + color.YellowString(search) + ".")
-		runWithPrompt("Update Homebrew formulae database, "brew update")
+		runWithPrompt("Update Homebrew formulae database", "brew update")
 	}
 }
 
