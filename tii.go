@@ -36,11 +36,11 @@ automatically trigger it. The name tii is an acronym for "Then Install It".`
 func main() {
 	if _, err := exec.LookPath("brew"); err != nil {
 		fmt.Println("Homebrew is not installed. Install it to use tii")
-		runWithPrompt(`Run /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" to install Homebrew?`, `/bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`)
+		runWithPrompt("Install Homebrew", `/bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`)
 		return
 	}
 	if len(os.Args) > 2 {
-		color.Red("Error: too many arguments")
+		handleErrStr("error: too many arguments")
 		fmt.Println(helpMsg)
 		return
 	}
@@ -55,13 +55,16 @@ func main() {
 func findPkg(search string) {
 	file, err := os.Open(formulaeLocation)
 	if err != nil {
-		fmt.Println("Could not open " + formulaeLocation)
+		handleErrStr("Could not open " + formulaeLocation)
+		handleErr(err)
+		return
 	}
 	defer file.Close()
 	list, err := file.Readdirnames(0) // >=0 to read all files and folders
 	_ = file.Close()                  // close file right after reading so it's run even if ^C or os.Exit() used later in the function
 	if err != nil {
-		fmt.Println("Got error while trying to list files in " + formulaeLocation)
+		handleErrStr("An error occurred while trying to list files in " + formulaeLocation)
+		handleErr(err)
 	}
 	possibleMatches := make([]string, 0, 5)
 	gotExactMatch := false
@@ -70,7 +73,7 @@ func findPkg(search string) {
 		if formulaName == search {
 			fmt.Println("Found exact match")
 			gotExactMatch = true
-			runWithPrompt("Run `brew install "+formulaName+"`?", "brew install "+formulaName)
+			runWithPrompt("Run", "brew install "+formulaName)
 			break
 		} else if strings.Contains(formulaName, search) {
 			possibleMatches = append(possibleMatches, formulaName)
@@ -82,12 +85,12 @@ func findPkg(search string) {
 			fmt.Println(strconv.Itoa(i+1) + ": " + color.GreenString(name))
 		}
 		if ok, i := promptInt("Enter number to install or press enter to quit: ", 1, len(possibleMatches)); ok {
-			runWithPrompt("Run `brew install "+possibleMatches[i+1]+"`?", "brew install "+possibleMatches[i+1])
+			runWithPrompt("Run", "brew install "+possibleMatches[i+1])
 		}
 	}
 	if !gotExactMatch {
 		fmt.Println("No exact matches found for " + color.YellowString(search) + ".")
-		runWithPrompt("Update Homebrew formulae database with `brew update`?", "brew update")
+		runWithPrompt("Update Homebrew formulae database, "brew update")
 	}
 }
 
@@ -127,17 +130,20 @@ func promptInt(promptStr string, lowerLimit int, upperLimit int) (bool, int) {
 }
 
 func runWithPrompt(promptStr string, command string) (ran bool) {
-	ok := promptBool(promptStr)
-	if ok {
-		cmd := exec.Command(os.Getenv("SHELL"), "-c", command) // run it with the users shell
+	yes := promptBool(promptStr + " with " + "`" + command + "`" + "?")
+	if yes {
+		// run it with the users shell
+		cmd := exec.Command(os.Getenv("SHELL"), "-c", command) //nolint //"Subprocess launched with function call as argument or cmd arguments"
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		if err := cmd.Run(); err != nil {
-			fmt.Println("Got error while trying to run", command)
+			handleErrStr("An error occurred while trying to run " + command)
+			handleErr(err)
+			return false
 		}
 	}
-	return ok
+	return yes
 }
 
 func argsHaveOption(long string, short string) (hasOption bool, foundAt int) {
@@ -149,25 +155,10 @@ func argsHaveOption(long string, short string) (hasOption bool, foundAt int) {
 	return false, 0
 }
 
-// err := filepath.Walk(formulaeLocation, func(path string, info os.FileInfo, err error) error {
-// 	fmt.Println(path)
-//	if err != nil {
-//		fmt.Println("Got error while trying to read from", path)
-//		return err
-//	}
-//	if info.IsDir() && !(path == formulaeLocation) { // walk also counts the root directory. Make sure we don't skip it!
-//		return filepath.SkipDir
-//	}
-//	formulaName := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))
-//	if formulaName == search {
-//		fmt.Println("Exact match found")
-//		runWithPrompt("Run `brew install " + formulaName + "`?", "brew install " + formulaName)
-//		return io.EOF
-//	}
-//	if strings.Contains(formulaName, search) {
-//		fmt.Println("Possible match found")
-//		runWithPrompt("Run `brew install " + formulaName + "`?", "brew install " + formulaName)
-//		return io.EOF
-//	}
-//	return nil
-//})
+func handleErr(err error) {
+  fmt.Fprintln(os.Stderr, color.Red("error: "+err.Error()))
+}
+
+func handleErrStr(str string) {
+  fmt.Fprintln(os.Stderr, color.Red(str))
+}
