@@ -79,7 +79,7 @@ func findPkg(search string) {
 			possibleMatches = append(possibleMatches, formulaName)
 		}
 	}
-	if len(possibleMatches) > 0 {
+	if !gotExactMatch && len(possibleMatches) > 0 {
 		fmt.Println("Presenting possible matches [" + color.CyanString(strconv.Itoa(len(possibleMatches))) + "]")
 		for i, name := range possibleMatches {
 			fmt.Println(color.CyanString(strconv.Itoa(i+1)) + ": " + name)
