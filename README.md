@@ -10,7 +10,7 @@ This program supports a similar function with support for macOS (only for macOS,
 
 The name Tii is an acronym for "Then Install It", what you will probably say when shown "command not found".
 
-# Usage
+## Usage
 
 ```text
 Usage: tii [--help/-h | <command>]
