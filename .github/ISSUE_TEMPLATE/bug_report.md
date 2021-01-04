@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help improve tii
+about: Create a report to help improve Tii
 title: 'Bug: '
 labels: bug
 assignees: ''
@@ -10,8 +10,6 @@ assignees: ''
 <!--You can remove parts which do not apply-->
 
 **Description of the bug**
-
-**Verbose output (Use the `--debug` option)**
 
 **Steps to Reproduce**
 

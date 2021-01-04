@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for tii
+about: Suggest an idea for Tii
 title: 'Feature: '
 labels: enhancement
 assignees: ''
