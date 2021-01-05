@@ -57,5 +57,5 @@ brews:
     description: "Command not found? Install it right there!"
     caveats: "For bash or zsh, put something like this in a profile file (like ~/.bash_profile or ~/.zshrc):\n. #{etc}/profile.d/tii_on_command_not_found.sh"
     install: |
-      fish_function.install "tii_on_command_not_found.fish"
-      (prefix/"etc/profile.d").install "tii_on_command_not_found.sh"
+      fish_function.install "shell/tii_on_command_not_found.fish"
+      (prefix/"etc/profile.d").install "shell/tii_on_command_not_found.sh"

@@ -2,29 +2,29 @@
 class Tii < Formula
   desc "Command not found? Install it right there!"
   homepage "https://github.com/quackduck/tii"
-  version "1.0.0"
+  version "1.0.1"
   bottle :unneeded
 
   if OS.mac?
-    url "https://github.com/quackduck/tii/releases/download/v1.0.0/tii_1.0.0_Darwin_x86_64.tar.gz"
-    sha256 "d527d4ee7a242115bf5a0280941506401fb342f7bbc92c14ab1eebcba644fc56"
+    url "https://github.com/quackduck/tii/releases/download/v1.0.1/tii_1.0.1_Darwin_x86_64.tar.gz"
+    sha256 "6097acdbf9ef70021c39a734a3c094512be2703777a4d1c1375feec1984c33ba"
   end
   if OS.linux? && Hardware::CPU.intel?
-    url "https://github.com/quackduck/tii/releases/download/v1.0.0/tii_1.0.0_Linux_x86_64.tar.gz"
-    sha256 "e501d8530e9a0110c1ee28b4a6672abf0e7ae0721d14276c56c1f242ed737164"
+    url "https://github.com/quackduck/tii/releases/download/v1.0.1/tii_1.0.1_Linux_x86_64.tar.gz"
+    sha256 "ee3fe45162e3651deb338d1dee5d03e614c925ae268d88c9fa91d2c1368fe272"
   end
   if OS.linux? && Hardware::CPU.arm? && !Hardware::CPU.is_64_bit?
-    url "https://github.com/quackduck/tii/releases/download/v1.0.0/tii_1.0.0_Linux_armv6.tar.gz"
-    sha256 "d15e72a38f55994fe4ef06048a14643e6618f46aaa7e50fc6b20b5c2abf42966"
+    url "https://github.com/quackduck/tii/releases/download/v1.0.1/tii_1.0.1_Linux_armv6.tar.gz"
+    sha256 "e239adab4ce71f0c3e0e57ff1a9c39e784d007481ff4b68c95e2322a48a65a7c"
   end
   if OS.linux? && Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-    url "https://github.com/quackduck/tii/releases/download/v1.0.0/tii_1.0.0_Linux_arm64.tar.gz"
-    sha256 "06eff696dbc52e6a83420838fd52e81226f14902f3a54e6b9a445295bcfc45f1"
+    url "https://github.com/quackduck/tii/releases/download/v1.0.1/tii_1.0.1_Linux_arm64.tar.gz"
+    sha256 "f85570c5d319cbcebf0d82cff9f18ba78bbbcc93e96821ea691c4fb828ee763e"
   end
 
   def install
-    fish_function.install "shell/tii_on_command_not_found.fish"
-    (prefix/"etc/profile.d").install "shell/tii_on_command_not_found.sh"
+    fish_function.install "tii_on_command_not_found.fish"
+    (prefix/"etc/profile.d").install "tii_on_command_not_found.sh"
   end
 
   def caveats; <<~EOS

@@ -21,8 +21,8 @@ brews:
     For bash or zsh, put something like this in a profile file (like ~/.bash_profile or ~/.zshrc):
     . #{etc}/profile.d/tii_on_command_not_found.sh
   install: |
-    fish_function.install "shell/tii_on_command_not_found.fish"
-    (prefix/"etc/profile.d").install "shell/tii_on_command_not_found.sh"
+    fish_function.install "tii_on_command_not_found.fish"
+    (prefix/"etc/profile.d").install "tii_on_command_not_found.sh"
   description: Command not found? Install it right there!
   homepage: https://github.com/quackduck/tii
   goarm: "6"
@@ -84,14 +84,7 @@ archives:
   - goos: windows
     format: zip
   files:
-  - licence*
-  - LICENCE*
-  - license*
-  - LICENSE*
-  - readme*
-  - README*
-  - changelog*
-  - CHANGELOG*
+  - shell/*
   allow_different_binary_count: false
 snapshot:
   name_template: '{{ .Tag }}-next'
