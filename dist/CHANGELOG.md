@@ -1,3 +1,3 @@
 ## Changelog
 
-be52c02 Fix error in which shell scripts were not included in archives
+d31cdf3 Fix the error for real
