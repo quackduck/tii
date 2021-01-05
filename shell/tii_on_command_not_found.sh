@@ -1,19 +1,14 @@
 #!/bin/bash
-case "$(ps -cp "$$" -o command="")" in
-zsh)
+if [ "$ZSH_VERSION" ] && [ -t 0 ]; then # is zsh and is interactive
   command_not_found_handler() {
-    if [ -t 0 ]; then
-      echo -e "Searching for command with Tii"
-      tii $1
-    fi
+    echo "Searching for command with Tii"
+    tii $1
   }
-  ;;
-bash)
+elif [ "$BASH_VERSION" ] && [ -t 0 ]; then # is bash and is interactive
   command_not_found_handle() {
-    if [ -t 0 ]; then
-      echo -e "Searching for command with Tii"
-      tii $1
-    fi
+    echo "Searching for command with Tii"
+    tii $1
   }
-  ;;
-esac
+else
+  echo -e "This is not bash or zsh. Please run $0 only in these shells."
+fi
