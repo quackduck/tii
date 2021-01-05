@@ -1,0 +1,121 @@
+project_name: tii
+release:
+  github:
+    owner: quackduck
+    name: tii
+  name_template: '{{.Tag}}'
+milestones:
+- repo:
+    owner: quackduck
+    name: tii
+  name_template: '{{ .Tag }}'
+brews:
+- name: tii
+  tap:
+    owner: quackduck
+    name: homebrew-tap
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  caveats: |-
+    For bash or zsh, put something like this in a profile file (like ~/.bash_profile or ~/.zshrc):
+    . #{etc}/profile.d/tii_on_command_not_found.sh
+  install: |
+    fish_function.install "shell/tii_on_command_not_found.fish"
+    (prefix/"etc/profile.d").install "shell/tii_on_command_not_found.sh"
+  description: Command not found? Install it right there!
+  homepage: https://github.com/quackduck/tii
+  goarm: "6"
+scoop:
+  name: tii
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  commit_msg_template: Scoop update for {{ .ProjectName }} version {{ .Tag }}
+builds:
+- id: tii
+  goos:
+  - freebsd
+  - windows
+  - darwin
+  - linux
+  goarch:
+  - amd64
+  - arm
+  - arm64
+  - "386"
+  goarm:
+  - "6"
+  targets:
+  - freebsd_amd64
+  - freebsd_arm_6
+  - freebsd_arm64
+  - freebsd_386
+  - windows_amd64
+  - windows_386
+  - darwin_amd64
+  - linux_amd64
+  - linux_arm_6
+  - linux_arm64
+  - linux_386
+  dir: .
+  main: .
+  ldflags:
+  - -s -w
+  binary: tii
+  env:
+  - CGO_ENABLED=0
+  lang: go
+  gobinary: go
+archives:
+- id: default
+  builds:
+  - tii
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
+  replacements:
+    "386": 32-bit
+    amd64: x86_64
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+  format: tar.gz
+  format_overrides:
+  - goos: windows
+    format: zip
+  files:
+  - licence*
+  - LICENCE*
+  - license*
+  - LICENSE*
+  - readme*
+  - README*
+  - changelog*
+  - CHANGELOG*
+  allow_different_binary_count: false
+snapshot:
+  name_template: '{{ .Tag }}-next'
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+changelog:
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+  sort: asc
+dist: dist
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token
+  gitea_token: ~/.config/goreleaser/gitea_token
+before:
+  hooks:
+  - go mod download
+source:
+  name_template: '{{ .ProjectName }}-{{ .Version }}'
+  format: tar.gz
+github_urls:
+  download: https://github.com
+gitlab_urls:
+  download: https://gitlab.com
