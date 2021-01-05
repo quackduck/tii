@@ -42,7 +42,7 @@ automatically trigger it. The name Tii is an acronym for "Then Install It".`
 	underline               = color.New(color.Underline).SprintFunc()
 	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true"
 	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
-	version                 = "Tii v1.0.3"
+	version                 = "Tii v1.0.4"
 )
 
 func main() {
