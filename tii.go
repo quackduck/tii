@@ -14,39 +14,54 @@ import (
 
 var (
 	scanner = bufio.NewScanner(os.Stdin)
-	helpMsg = `Tii - Directly install command when not found
+	helpMsg = `Tii - Instantly install command when not found
 
 On most GNU/Linux systems, when a command is not found, a message showing what
-can be run to install the command is printed. However, macOS does not
-have this. This program supports a similar function with support for macOS
-(only for macOS, as of now). Instead of simply printing the command, Tii also
-offers to run it for you.
+can be run to install the command is printed. However, macOS does not have
+this. This program adds a similar function with support for macOS (only for
+macOS, as of now). Instead of simply printing the command, Tii also offers to
+run it for you.
 
-Usage: tii [--help/-h | <command>]
+Usage: tii [--help/-h | --version/-v | <command>]
+
 Examples:
    tii fish
    tii cowsay
    tii --help
 
+Environment:
+	TII_DISABLE_INTERACTIVE: If this variable is set to "true", Tii will
+		disable interactive output (prompting for confirmation) and not install
+		any packages.
+	TII_AUTO_INSTALL_EXACT_MATCHES: If this variable is set to "true", Tii will
+		automatically install exact matches without prompting for confirmation
+
 If Tii was installed correctly, using commands which are not found will
 automatically trigger it. The name Tii is an acronym for "Then Install It".`
-	formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
-	underline        = color.New(color.Underline).SprintFunc()
+	formulaeLocation        = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+	underline               = color.New(color.Underline).SprintFunc()
+	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true"
+	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
+	version                 = "Tii v1.0.0"
 )
 
 func main() {
 	if _, err := exec.LookPath("brew"); err != nil {
-		fmt.Println("Homebrew is not installed. Install it to use Tii")
+		handleErrStr("Homebrew is not installed. Install it to use Tii")
 		runWithPrompt("Install Homebrew", `/bin/bash -c "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`)
 		return
 	}
 	if len(os.Args) > 2 {
-		handleErrStr("too many arguments")
+		handleErrStr("Too many arguments")
 		fmt.Println(helpMsg)
 		return
 	}
 	if hasOption, _ := argsHaveOption("help", "h"); hasOption || len(os.Args) == 1 {
 		fmt.Println(helpMsg)
+		return
+	}
+	if hasOption, _ := argsHaveOption("version", "v"); hasOption {
+		fmt.Println(version)
 		return
 	}
 	findPkg(os.Args[1])
@@ -71,8 +86,12 @@ func findPkg(search string) {
 	for _, name := range list {
 		formulaName := strings.TrimSuffix(name, filepath.Ext(name))
 		if formulaName == search {
-			fmt.Println("Found exact match")
+			fmt.Println("Found exact match: " + color.YellowString(formulaName))
 			gotExactMatch = true
+			if autoInstallExactMatches {
+				fmt.Println("Installing it. Auto-install is enabled. ($TII_AUTO_INSTALL_EXACT_MATCHES is true)")
+				run("brew install " + formulaName)
+			}
 			if runWithPrompt("Install it", "brew install "+formulaName) {
 				return
 			}
@@ -97,6 +116,9 @@ func findPkg(search string) {
 }
 
 func promptBool(promptStr string) (yes bool) {
+	if disablePrompts {
+		return false
+	}
 	for {
 		fmt.Print(underline(promptStr) + " (y/N) > ")
 		color.Set(color.FgCyan)
@@ -118,6 +140,9 @@ func promptBool(promptStr string) (yes bool) {
 
 // quits if user enters enter
 func promptInt(promptStr string, lowerLimit int, upperLimit int) (bool, int) {
+	if disablePrompts {
+		return false, 0
+	}
 	for {
 		fmt.Print(underline(promptStr) + ": ")
 		color.Set(color.FgCyan)
@@ -136,23 +161,26 @@ func promptInt(promptStr string, lowerLimit int, upperLimit int) (bool, int) {
 }
 
 func runWithPrompt(promptStr string, command string) (ran bool) {
-	yes := promptBool(promptStr + " with " + "`" + color.YellowString(command) + "`" + "?")
+	yes := promptBool(promptStr + " with " + color.YellowString(command) + "?")
 	if yes {
-		// run it with the users shell
-		cmd := exec.Command(os.Getenv("SHELL"), "-c", command) //nolint //"Subprocess launched with function call as argument or cmd arguments"
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		if err := cmd.Run(); err != nil {
-			handleErrStr("An error occurred while trying to run " + command)
-			handleErr(err)
-			return false
-		}
-		cmd.Stderr = nil
-		cmd.Stdout = nil
-		cmd.Stdin = nil
+		run(command)
 	}
 	return yes
+}
+
+func run(command string) {
+	// run it with the users shell
+	cmd := exec.Command(os.Getenv("SHELL"), "-c", command) //nolint //"Subprocess launched with function call as argument or cmd arguments"
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	if err := cmd.Run(); err != nil {
+		handleErrStr("An error occurred while trying to run " + command)
+		handleErr(err)
+	}
+	cmd.Stderr = nil
+	cmd.Stdout = nil
+	cmd.Stdin = nil
 }
 
 func argsHaveOption(long string, short string) (hasOption bool, foundAt int) {
