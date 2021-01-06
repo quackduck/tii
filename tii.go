@@ -40,7 +40,7 @@ If Tii was installed correctly, using commands which are not found will
 automatically trigger it. The name Tii is an acronym for "Then Install It".`
 	formulaeLocation        = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
 	underline               = color.New(color.Underline).SprintFunc()
-	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true"
+	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true" //nolint // complains about using the literal string "true" 3 times
 	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
 	version                 = "Tii v1.0.4"
 )
@@ -63,6 +63,9 @@ func main() {
 	if hasOption, _ := argsHaveOption("version", "v"); hasOption {
 		fmt.Println(version)
 		return
+	}
+	if disablePrompts {
+		fmt.Println("Running Tii in non-interactive mode. ($TII_DISABLE_INTERACTIVE is true)")
 	}
 	findPkg(os.Args[1])
 }
@@ -89,7 +92,7 @@ func findPkg(search string) {
 			fmt.Println("Found exact match: " + color.YellowString(formulaName))
 			gotExactMatch = true
 			if autoInstallExactMatches {
-				fmt.Println("Installing it. Auto-install is enabled. ($TII_AUTO_INSTALL_EXACT_MATCHES is true)")
+				fmt.Println("Installing it because auto-install is enabled. ($TII_AUTO_INSTALL_EXACT_MATCHES is true)")
 				run("brew install " + formulaName)
 			}
 			if runWithPrompt("Install it", "brew install "+formulaName) {
