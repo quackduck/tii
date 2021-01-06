@@ -3,3 +3,4 @@ __debug_bin
 /tii
 .idea
 makefile
+dist/
