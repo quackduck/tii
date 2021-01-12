@@ -13,3 +13,10 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+*.DS_Store	# Binaries for programs and plugins
+__debug_bin	*.exe
+/tii	*.exe~
+.idea	*.dll
+makefile	*.so
+dist/
