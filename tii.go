@@ -1,3 +1,4 @@
+// This software is distributed under the MIT License.
 package main
 
 import (
@@ -42,7 +43,7 @@ automatically trigger it. The name Tii is an acronym for "Then Install It".`
 	underline               = color.New(color.Underline).SprintFunc()
 	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true" //nolint // complains about using the literal string "true" 3 times
 	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
-	version                 = "Tii v1.0.4"
+	version                 = "development" // This will be set at build time using ldflags: go build -ldflags="-s -w -X main.version=$(git describe --tags --abbrev=0)"
 )
 
 func main() {
@@ -61,7 +62,7 @@ func main() {
 		return
 	}
 	if hasOption, _ := argsHaveOption("version", "v"); hasOption {
-		fmt.Println(version)
+		fmt.Println("Tii " + version)
 		return
 	}
 	if disablePrompts {
@@ -99,7 +100,7 @@ func findPkg(search string) {
 				return
 			}
 			break
-		} else if strings.Contains(formulaName, search) {
+		} else if strings.Contains(formulaName, search) || strings.Contains(search, formulaName) {
 			possibleMatches = append(possibleMatches, formulaName)
 		}
 	}
@@ -196,7 +197,7 @@ func argsHaveOption(long string, short string) (hasOption bool, foundAt int) {
 }
 
 func handleErr(err error) {
-	_, _ = fmt.Fprintln(os.Stderr, color.RedString("Error: ")+err.Error())
+	handleErrStr(err.Error())
 }
 
 func handleErrStr(str string) {
