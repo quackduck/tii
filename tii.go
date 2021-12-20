@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -39,12 +40,21 @@ Environment:
 
 If Tii was installed correctly, using commands which are not found will
 automatically trigger it. The name Tii is an acronym for "Then Install It".`
-	formulaeLocation        = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+	formulaeLocation        = "" // set in init()
 	underline               = color.New(color.Underline).SprintFunc()
 	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true" //nolint // complains about using the literal string "true" 3 times
 	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
 	version                 = "development" // This will be set at build time using ldflags: go build -ldflags="-s -w -X main.version=$(git describe --tags --abbrev=0)"
 )
+
+func init() {
+	// on M1, the formula location is different
+	if runtime.GOARCH == "arm" {
+		formulaeLocation = "/opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+	} else {
+		formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+	}
+}
 
 func main() {
 	if _, err := exec.LookPath("brew"); err != nil {
