@@ -49,7 +49,7 @@ automatically trigger it. The name Tii is an acronym for "Then Install It".`
 
 func init() {
 	// on M1, the formula location is different
-	if runtime.GOARCH == "arm" {
+	if runtime.GOARCH == "arm64" {
 		formulaeLocation = "/opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula"
 	} else {
 		formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
