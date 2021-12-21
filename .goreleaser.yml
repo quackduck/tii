@@ -58,5 +58,5 @@ brews:
     caveats: "For bash or zsh, put something like this in a profile file (like ~/.bash_profile or ~/.zshrc):\n. #{etc}/profile.d/tii_on_command_not_found.sh"
     install: |
       bin.install "tii"
-      fish_function.install "shell/__fish_command_not_found_handler"
+      fish_function.install "shell/__fish_command_not_found_handle.fish"
       (prefix/"etc/profile.d").install "shell/tii_on_command_not_found.sh"
