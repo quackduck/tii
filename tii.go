@@ -105,6 +105,7 @@ func findPkg(search string) {
 			if autoInstallExactMatches {
 				fmt.Println("Installing it because auto-install is enabled. ($TII_AUTO_INSTALL_EXACT_MATCHES is true)")
 				run("brew install " + formulaName)
+				return
 			}
 			if runWithPrompt("Install it", "brew install "+formulaName) {
 				return
