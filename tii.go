@@ -40,7 +40,7 @@ Environment:
 
 If Tii was installed correctly, using commands which are not found will
 automatically trigger it. The name Tii is an acronym for "Then Install It".`
-	formulaeLocation        = "" // set in init()
+	prefix                  = "" // set in init()
 	underline               = color.New(color.Underline).SprintFunc()
 	disablePrompts          = os.Getenv("TII_DISABLE_INTERACTIVE") == "true" //nolint // complains about using the literal string "true" 3 times
 	autoInstallExactMatches = os.Getenv("TII_AUTO_INSTALL_EXACT_MATCHES") == "true"
@@ -50,9 +50,9 @@ automatically trigger it. The name Tii is an acronym for "Then Install It".`
 func init() {
 	// on M1, the formula location is different
 	if runtime.GOARCH == "arm64" {
-		formulaeLocation = "/opt/homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+		prefix = "/opt/homebrew/Library/Taps/homebrew"
 	} else {
-		formulaeLocation = "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/Formula"
+		prefix = "/usr/local/Homebrew/Library/Taps/homebrew"
 	}
 }
 
@@ -81,20 +81,36 @@ func main() {
 	findPkg(os.Args[1])
 }
 
+// returns true if the package was found and the user installed it
 func findPkg(search string) {
-	file, err := os.Open(formulaeLocation)
+	core, err := os.Open(prefix + "/homebrew-core/Formula")
 	if err != nil {
-		handleErrStr("Could not open " + formulaeLocation)
+		handleErrStr("Could not open " + prefix)
 		handleErr(err)
 		return
 	}
-	defer file.Close()
-	list, err := file.Readdirnames(0) // >=0 to read all files and folders
-	_ = file.Close()                  // close file right after reading so it's run even if ^C or os.Exit() used later in the function
+	list, err := core.Readdirnames(0) // >=0 to read all files and folders
+	_ = core.Close()                  // close file right after reading so it's run even if ^C or os.Exit() used later in the function
 	if err != nil {
-		handleErrStr("An error occurred while trying to list files in " + formulaeLocation)
+		handleErrStr("An error occurred while trying to list files in " + prefix + "/homebrew-core/Formula")
 		handleErr(err)
+		return
 	}
+	cask, err := os.Open(prefix + "/homebrew-cask/Casks")
+	if err != nil {
+		handleErrStr("Could not open " + prefix)
+		handleErr(err)
+		return
+	}
+	casklist, err := cask.Readdirnames(0) // >=0 to read all files and folders
+	_ = cask.Close()
+	if err != nil {
+		handleErrStr("An error occurred while trying to list files in " + prefix + "/homebrew-cask/Casks")
+		handleErr(err)
+		return
+	}
+	list = append(list, casklist...)
+
 	possibleMatches := make([]string, 0, 5)
 	gotExactMatch := false
 	for _, name := range list {
@@ -105,6 +121,7 @@ func findPkg(search string) {
 			if autoInstallExactMatches {
 				fmt.Println("Installing it because auto-install is enabled. ($TII_AUTO_INSTALL_EXACT_MATCHES is true)")
 				run("brew install " + formulaName)
+				return
 			}
 			if runWithPrompt("Install it", "brew install "+formulaName) {
 				return
@@ -118,9 +135,15 @@ func findPkg(search string) {
 		fmt.Println("Presenting possible matches [" + color.CyanString(strconv.Itoa(len(possibleMatches))) + "]")
 		for i, name := range possibleMatches {
 			fmt.Println(color.CyanString(strconv.Itoa(i+1)) + ": " + name)
+			if i == 99 {
+				fmt.Println("... and more")
+				break
+			}
 		}
 		if ok, i := promptInt("Enter number to install or press enter to quit", 1, len(possibleMatches)); ok {
-			runWithPrompt("Install it", "brew install "+possibleMatches[i-1])
+			if runWithPrompt("Install it", "brew install "+possibleMatches[i-1]) {
+				return
+			}
 		}
 	}
 	if !gotExactMatch {
