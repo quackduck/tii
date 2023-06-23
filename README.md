@@ -1,16 +1,20 @@
 # Tii
 
-On most GNU/Linux systems, when a command is not found, a message showing what can be run to install the command is printed. However, macOS does not have this.
+On most GNU/Linux systems, when a command isn't found, a message showing what
+to run to install the command is shown. However, macOS doesn't have
+this. 
 
-This program adds a similar function for macOS (only for macOS, as of now). Instead of simply printing the command, Tii also offers to run it for you.
+This tool adds a similar function with support for macOS using
+the Homebrew package manager. Instead of simply printing the best matches, Tii shows package
+descriptions and also offers to run an install command for you.
 
 [comment]: <> ([![asciicast]&#40;https://asciinema.org/a/382511.svg&#41;]&#40;https://asciinema.org/a/382511?autoplay=1&speed=2&#41;)
 
-<a href="https://asciinema.org/a/382511?autoplay=1&speed=2" target="_blank">
-<img src="https://asciinema.org/a/382511.svg" alt="demo">
+<a href="https://asciinema.org/a/592995?autoplay=1&speed=2" target="_blank">
+<img src="https://asciinema.org/a/592995.svg" alt="demo">
 </a>
 
-The name Tii is an acronym for "Then Install It", which is what you will probably say when shown "Command not found".
+The name Tii is an acronym for "Then Install It", which is what you'll probably say when shown "Command not found".
 
 ## Installing
 As of now, only macOS is supported
@@ -18,31 +22,31 @@ As of now, only macOS is supported
 brew install quackduck/tap/tii
 ```
 
-## Usage
+## Usage, environment and files
 
-Tii will be automatically triggered if a command is not found and so you usually do not need to directly interact with it. 
-
-The Tii binary has the following usage:
+Tii will be automatically triggered if a command is not found and so you usually do not need to directly interact with it.
 
 ```text
-Usage: tii [--help/-h | --version/-v | <command>]
+Usage: tii [--help/-h | --version/-v | --refresh-cache/-r | <command>]
 
 Examples:
    tii fish
    tii cowsay
    tii --help
+
+Environment:
+   TII_DISABLE_INTERACTIVE: If this variable is set to "true", Tii will
+      disable interactive output (prompting for confirmation) and not install
+      any packages.
+   TII_AUTO_INSTALL_EXACT_MATCHES: If this variable is set to "true", Tii will
+      automatically install exact matches without prompting for confirmation
+
+Files:
+   $XDG_DATA_HOME/tii: used to cache package list info. If $XDG_DATA_HOME is
+      not set, ~/.local/share is used instead. Refresh the cache using the
+      --refresh-cache option.
 ```
 
-## Environment
-These are the environment variables that can affect Tii:
-
-* If `TII_DISABLE_INTERACTIVE` is set to "true", Tii will
-    disable interactive output (prompting for confirmation) and not install
-    any packages.
-
-* If `TII_AUTO_INSTALL_EXACT_MATCHES` is set to "true", Tii will
-    automatically install exact matches without prompting for confirmation. **This variable overrides `TII_DISABLE_INTERACTIVE`.**
-  
 ## Uninstalling
 If you have issues with Tii, head over to [issues](https://github.com/quackduck/tii/issues).
 
@@ -56,6 +60,7 @@ Here's a list of all the files Tii uses:
 /usr/local/bin/tii
 /usr/local/share/fish/vendor_functions.d/tii_on_command_not_found.fish
 /etc/profile.d/tii_on_command_not_found.sh
+$XDG_DATA_HOME/tii or ~/.local/share/tii
 ```
 
 ## Any other business

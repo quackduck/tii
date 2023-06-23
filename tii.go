@@ -19,11 +19,11 @@ var (
 	scanner = bufio.NewScanner(os.Stdin)
 	helpMsg = `Tii - Instantly install command when not found
 
-On most GNU/Linux systems, when a command is not found, a message showing what
-can be run to install the command is printed. However, macOS does not have
-this. This program adds a similar function with support for macOS using
-Homebrew. Instead of simply printing the best matches, Tii shows package 
-descriptions and also offers to run an install command for you.
+On most GNU/Linux systems, when a command isn't found, a message showing what
+to run to install the command is shown. However, macOS doesn't have
+this. This tool adds a similar function with support for macOS using
+the Homebrew package manager. Instead of simply printing the best matches, Tii
+shows package descriptions and also offers to run an install command for you.
 
 Usage: tii [--help/-h | --version/-v | --refresh-cache/-r | <command>]
 
