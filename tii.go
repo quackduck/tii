@@ -147,7 +147,14 @@ func findPkg(search string) {
 		}
 	}
 	fmt.Println("No exact matches found for " + color.YellowString(search) + ".")
-	runWithPrompt("Update Homebrew formulae database", "brew update")
+	if promptBool("Refresh package info cache?") {
+		_, _, err = getCachedPackageInfo(true)
+		if err != nil {
+			handleErr(err)
+			return
+		}
+		fmt.Println("Cache refreshed! Try searching again if needed.")
+	}
 }
 
 func getCachedPackageInfo(forceRefresh bool) ([]string, map[string]string, error) {
